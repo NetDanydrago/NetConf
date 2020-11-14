@@ -1,0 +1,57 @@
+﻿@page "/product"
+@inject HttpClient HttpClient
+<h3>Lista de Productos</h3>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Nombre</th>
+            <th>Precio</th>
+            <th>Unidades en Stock</th>
+        </tr>
+    </thead>
+    <tbody>
+
+        <Virtualize Context="Product" ItemsProvider="@LoadProducts" ItemSize="10" OverscanCount="10">  
+            <ItemContent>
+                <tr>
+                    <td>@Product.ProductId</td>
+                    <td>@Product.ProductName</td>
+                    <td>@Product.UnitPrice</td>
+                    <td>@Product.UnitsInStock</td>
+                </tr>
+            </ItemContent>
+            <Placeholder>
+                <tr>
+                    <td>
+                        Loading ID
+                    </td>
+                    <td>
+                        Loading Name
+                    </td>
+                    <td>
+                        Loading Price
+                    </td>
+                    <td>
+                        Loading Stock
+                    </td>
+                </tr>
+            </Placeholder>
+             
+        </Virtualize>
+    </tbody>
+</table>
+
+
+@code {
+
+
+
+    protected async ValueTask<ItemsProviderResult<Product>> LoadProducts(ItemsProviderRequest request)
+    {
+        var Products = await HttpClient.GetFromJsonAsync<List<Product>>("api/getproducts");
+
+        return new ItemsProviderResult<Product>(Products.Skip(request.StartIndex).Take(request.Count), Products.Count());
+    }
+
+}

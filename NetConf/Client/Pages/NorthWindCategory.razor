@@ -1,0 +1,57 @@
+﻿@page "/category"
+@inject HttpClient HttpClient
+
+<h3>Lista de Categorias</h3>
+
+<div class="container">
+    @if (Categories == null)
+    {
+        <text>Loanding...</text>
+    }
+    else
+    {
+    <div class="row">
+        <Virtualize Items="Categories">
+            <div class="card mr-4 mb-4 " style="width: 500px;">
+                <div class="row no-gutters" style="border: 2px solid #512bd4; border-radius: 7px;">
+                    <div class="col-sm-5 d-flex align-items-center">
+                        <img class="card-img" src="data:image/jpeg;base64,@context.CategoryImage">
+                    </div>
+                    <div class="col-sm-7">
+                        <div class="card-body" >
+                            <h5 class="card-title">@context.CategoryName</h5>
+                            <p class="card-text">@context.CategoryDescription</p>
+                            <button  @onclick="() => ShowModalCategory(context)" class="btn btn-primary">Editar</button>
+                            <button class="btn btn-danger">Eliminar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </Virtualize>
+    </div>
+
+    }
+</div>
+@if(IsShow)
+{
+    <EditCategory Category="ItemCategory" />
+}
+
+@code {
+
+    bool IsShow = false;
+    private List<Category> Categories;
+    private Category ItemCategory;
+
+    private void ShowModalCategory(Category category)
+    {
+        ItemCategory = category;
+        IsShow = true;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Categories = await HttpClient.GetFromJsonAsync
+            <List<Category>>("api/getCategories");
+    }
+}
